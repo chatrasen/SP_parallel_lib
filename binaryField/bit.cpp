@@ -205,6 +205,12 @@ bit::bit(long long int b)
 
 }
 
+bit::bit(int b) 
+{
+	this->a =  _mm256_set_epi64x(0,0,0,b);
+
+}
+
 bit::bit(uint64_t *b) 
 {
 	this->a =  _mm256_set_epi64x(b[3],b[2],b[1],b[0]);

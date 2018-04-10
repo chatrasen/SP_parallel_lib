@@ -11,6 +11,7 @@ public:
 	__m256i  a;
 	bit();
 	bit(long long int b);
+	bit(int b);
 	bit(uint64_t *b);
 	bit(const __m256i &b);
 	bit operator+(const bit &b);

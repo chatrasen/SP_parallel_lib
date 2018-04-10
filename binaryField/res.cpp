@@ -168,6 +168,16 @@ public:
 		degree(temp);
 		return temp;
 	}
+
+	static node shift_mul(const node &b, bit x, int p, int q, int r)
+	{
+		node temp(b.x+p, b.y+q, b.z+r);
+		for(int i = 0; i <= b.x; i++)
+			for(int j = 0; j <= b.y; j++)
+				for(int k = 0; k <= b.z; k++)
+					temp.a[i+p][j+q][k+r] = b.a[i][j][k]*x;
+		return temp;
+	}
 	node operator /(const node &b)
 	{
 		node temp(max(b.x,this->x),max(b.y,this->y),max(b.z,this->z)),temp2(*this);
@@ -219,19 +229,17 @@ public:
 			//if(count != 1 && !w) break;
 			if(f) break;
 			if(p < I || q < J || r < K) break;
-			cout<<"p = "<<p<<" q = "<<q<<" r = "<<r<<"\n";
+			//cout<<"p = "<<p<<" q = "<<q<<" r = "<<r<<"\n";
 			int i = p - I, j = q - J, k = r - K;
 			temp.x = max(temp.x,i);
 			temp.y = max(temp.y,j);
 			temp.z = max(temp.z,k);
-			cout<<"ikkada 1\n";
-			cout<<b.a[I][J][K]<<"\n";
-			cout << temp2.a[p][q][r] << "\n";
+			//cout<<"ikkada 1\n";
+			//cout<<b.a[I][J][K]<<"\n";
+			//cout << temp2.a[p][q][r] << "\n";
 			temp.a[i][j][k] = temp2.a[p][q][r]/b.a[I][J][K];
-			cout<<"ikkada 2\n";
-			node c(i,j,k);
-			c.a[i][j][k] = temp.a[i][j][k];
-		    c = c*b;
+			//cout<<"ikkada 2\n";
+			node c = shift_mul(b,temp.a[i][j][k],i,j,k);
 			temp2 = temp2 - c;
 		}
 		degree(temp);
@@ -291,16 +299,7 @@ public:
 			if(p < I || q < J || r < K) break;
 			//cout<<"p = "<<p<<" q = "<<q<<" r = "<<r<<"\n";
 			int i = p - I, j = q - J, k = r - K;
-			node c(i,j,k);
-			// cout<<"c: \n"; print(c);
-			// cout<<"temp2: \n"; print(temp2);
-			// cout<<"b : \n"; print(b);
-			// cout<<"i = "<<i<<" j = "<<j<<" k = "<<k<<"\n";
-			// cout<<"p = "<<p<<" q = "<<q<<" r = "<<r<<"\n";
-			// cout<<"I = "<<I<<" J = "<<J<<" K = "<<K<<"\n";
-			c.a[i][j][k] = temp2.a[p][q][r]/b.a[I][J][K];
-			//cout<<"here ra\n";
-		    c = c*b;
+		    node c = shift_mul(b,temp2.a[p][q][r]/b.a[I][J][K],i,j,k);
 		   // cout<<"in here\n"; 
 			temp2 = temp2 - c;
 			//cout<<"end \n";
@@ -350,7 +349,7 @@ void print(node r)
 
 node PRS(node &a, node &b)
 {
-	cout<<"PRS begin\n";
+	//cout<<"PRS begin\n";
 	node r0 = a, r1 = b;
 	if(r1.x > r0.x) swap(r0,r1);
 	int i = 1;
@@ -360,7 +359,7 @@ node PRS(node &a, node &b)
 	//cout<<"loop begin\n";
 	while(r1.x > 0)
 	{
-		cout<<"i = "<<i<<"\n";
+		//cout<<"i = "<<i<<"\n";
 		if(i == 1) d1 = d0 = r0.x - r1.x;
 		else d1 = r0.x - r1.x;
 		node g(0,0,0);
@@ -390,19 +389,19 @@ node PRS(node &a, node &b)
 			node t1 = psi;
 			for(int j = 0; j < d0 ; j++) t1 = t1*gamma0;
 			if(d0%2) t1 = t1*g;
-			cout<<"psi 1\n";
+			//cout<<"psi 1\n";
 			psi = t1/t2;
-			cout<<"psi 2\n";
+			//cout<<"psi 2\n";
 			beta = g*gamma0;
 			for(int j = 0; j < d1; j++) beta = beta*psi;
 		}
 		node result = r0;
 		for(int j = 0; j < d1+1; j++) result = result*gamma1;
-		cout<<"here 1\n";
+		//cout<<"here 1\n";
 		result  = result%r1;
-		cout<<"here 2\n";
+		//cout<<"here 2\n";
 		result = result/beta;
-		cout<<"here 3\n";
+		//cout<<"here 3\n";
 		r0 = r1;
 		r1 = result;
 		gamma0 = gamma1;
@@ -419,7 +418,7 @@ node PRS(node &a, node &b)
 		for(int j = 0; j < d; j++) result = result*r1;
 		r1 = result;
 	}
-	cout<<"PRS end\n";
+	//cout<<"PRS end\n";
 	return r1;
 }
 
@@ -434,9 +433,9 @@ node shift(node &f)
 	//cout<<"shift end\n";
 }
 
-node f(ll a, ll b, vector<ll> v, ll n, ll X, ll Y)
+node f(bit & a, bit & b, bit *v, int n, ll X, ll Y)
 {
-	cout<<"n = "<<n<<" X"<<X<<" X"<<Y<<"\n";
+	//cout<<"n = "<<n<<" X"<<X<<" X"<<Y<<"\n";
 	if(n == 2)
 	{
 		node result(1,1,0);
@@ -450,25 +449,26 @@ node f(ll a, ll b, vector<ll> v, ll n, ll X, ll Y)
 	{
 		//cout<<"aaya\n";
 		node result(2,2,0);
-		result.a[0][0][0] = a*a - 4*b*v[0];
-		result.a[0][1][0] = -2*a*v[0] -4*b;
+		result.a[0][0][0] = a*a - bit(4)*b*v[0];
+		result.a[0][1][0] = bit(-2)*a*v[0] + bit(-4)*b;
 		result.a[0][2][0] = v[0]*v[0];
-		result.a[1][0][0] = -2*(v[0]*a+2*b);
-		result.a[1][1][0] = -2*(v[0]*v[0] + a);
-		result.a[1][2][0] = -2*(v[0]);
+		result.a[1][0][0] = bit(-2)*(v[0]*a+ bit(2)*b);
+		result.a[1][1][0] = bit(-2)*(v[0]*v[0] + a);
+		result.a[1][2][0] = bit(-2)*(v[0]);
 		result.a[2][0][0] = v[0]*v[0];
-		result.a[2][1][0] = -2*v[0];
+		result.a[2][1][0] = bit(-2)*v[0];
 		result.a[2][2][0] = 1;
 		//cout<<"gaya\n";
 		result.degree(result);
 		return result;
 	}
 	node f1,f2;
-	ll t = min(n/2 -1,1LL);
+	ll t = min(n/2 -1,1);
 	ll n1 = n - t, n2 = t + 2;;
-	vector<ll> v1,v2;
-	for(ll i = 0; i < n1-2; i++) v1.push_back(v[i]);
-	for(ll i = n1-2; i < n-2; i++) v2.push_back(v[i]);
+	//vector<bit> v1,v2;
+	//for(ll i = 0; i < n1-2; i++) v1.push_back(v[i]);
+	//for(ll i = n1-2; i < n-2; i++) v2.push_back(v[i]);
+	bit *v1 = v, *v2 = (v + (n1-1));
 	f1 = f(a,b,v1,n1,X,Y+1);
 	f2 = f(a,b,v2,n2,Y,Y+1);
 	f1.degree(f1);
@@ -482,9 +482,9 @@ node f(ll a, ll b, vector<ll> v, ll n, ll X, ll Y)
 	node result = shift(r2);
 	return result;
 }
-node f(ll a, ll b, vector<ll> v, ll n, ll X)
+node f(bit &a, bit &b, bit *v, int n, ll X)
 {
-	cout<<"n = "<<n<<" X"<<X<<"\n";
+	//cout<<"n = "<<n<<" X"<<X<<"\n";
 	if(n == 2)
 	{
 		node result(1,0,0);
@@ -496,19 +496,21 @@ node f(ll a, ll b, vector<ll> v, ll n, ll X)
 	if(n == 3)
 	{
 		node result(2,0,0);
-		result.a[0][0][0] = (v[0]*v[1] - a)*(v[0]*v[1] - a) - 4*b*(v[0]+v[1]);
-		result.a[1][0][0] = -2*((v[0] + v[1])*(v[0]*v[1] + a) + 2*b);
+		result.a[0][0][0] = (v[0]*v[1] - a)*(v[0]*v[1] - a) - bit(4)*b*(v[0]+v[1]);
+		result.a[1][0][0] = bit(-2)*((v[0] + v[1])*(v[0]*v[1] + a) + bit(2)*b);
 		result.a[2][0][0] = (v[0] - v[1])*(v[0] - v[1]);
 		//cout<<"gaya\n";
 		result.degree(result);
+		//print(result);
 		return result;
 	}
 	node f1,f2;
-	ll t = min(n/2 -1,1LL);
+	ll t = min(n/2 -1,1);
 	ll n1 = n - t, n2 = t + 2;;
-	vector<ll> v1,v2;
-	for(ll i = 0; i < n1-1; i++) v1.push_back(v[i]);
-	for(ll i = n1-1; i < n-1; i++) v2.push_back(v[i]);
+	//vector<bit> v1,v2;
+	//for(ll i = 0; i < n1-1; i++) v1.push_back(v[i]);
+	//for(ll i = n1-1; i < n-1; i++) v2.push_back(v[i]);
+	bit *v1 = v, *v2 = (v + (n1-1));
 	f1 = f(a,b,v1,n1,X+1);
 	f2 = f(a,b,v2,n2,X,X+1);
 	f1.degree(f1);
@@ -518,9 +520,9 @@ node f(ll a, ll b, vector<ll> v, ll n, ll X)
 	return result;
 }
 
-node f(ll a, ll b, vector<ll> v, ll n)
+node f(bit & a, bit &b, bit *v, int n)
 {	
-	cout<<"n = "<<n<<"\n";
+	//cout<<"n = "<<n<<"\n";
 	if(n == 2) 
 	{
 		//cout<<"hello\n";
@@ -533,15 +535,16 @@ node f(ll a, ll b, vector<ll> v, ll n)
 	if(n == 3) 
 	{
 		node result(0,0,0);
-		result.a[0][0][0] = (v[0] - v[1])*(v[0] - v[1])*v[2]*v[2] - 2*((v[0] + v[1])*(v[0]*v[1] + a) + 2*b)*v[2] + ((v[0]*v[1] - a)*(v[0]*v[1] - a) - 4*b*(v[0] + v[1]));
+		result.a[0][0][0] = (v[0] - v[1])*(v[0] - v[1])*v[2]*v[2] - bit(2)*((v[0] + v[1])*(v[0]*v[1] + a) + bit(2)*b)*v[2] + ((v[0]*v[1] - a)*(v[0]*v[1] - a) - bit(4)*b*(v[0] + v[1]));
 		return result;
 	}
 	node f1,f2;
-	ll t = min(n/2 -1,1LL);
+	ll t = min(n/2 -1,1);
 	ll n1 = n - t, n2 = t + 2;;
-	vector<ll> v1,v2;
-	for(ll i = 0; i < n1-1; i++) v1.push_back(v[i]);
-	for(ll i = n1-1; i < n; i++) v2.push_back(v[i]);
+	//vector<bit> v1,v2;
+	bit *v1 = v, *v2 = (v + (n1-1));
+	// for(ll i = 0; i < n1-1; i++) v1.push_back(v[i]);
+	// for(ll i = n1-1; i < n; i++) v2.push_back(v[i]);
 	f1 = f(a,b,v1,n1,1);
 	f2 = f(a,b,v2,n2,1);
 	f1.degree(f1);
@@ -561,10 +564,23 @@ int main(int argc, char const *argv[])
 	// cout<<w.a[1][0][0]<<"\n";
 	ll n;
 	cin>>n;
-	vector<ll> v(n);
-	for(ll i = 0; i < n; i++) cin>>v[i];
-	node z = f(0,0,v,n);
+	vector<ll> g(n);
+	for(ll i = 0; i < n; i++) cin>>g[i];
+	//cout<<"before \n";
+	bit *v = new bit[n];
+	//cout<<"hello\n";
+	for(int i = 0; i < n; i++) v[i] = g[i];
+	//cout<<"v : "; for(int i = 0; i < n; i++) cout<<v[i]<<" "; cout<<"\n";
+	bit a(0), b(0);
+	clock_t c1, c2;
+   	srand((unsigned int)time(NULL));
+   	c1 = clock();
+   	//cout<<"start\n";
+	node z = f(a,b,v,n);
+	c2 = clock();
+	double di = (double)(c2-c1) / (double)CLOCKS_PER_SEC;
 	cout<<z.a[0][0][0]<<"\n";
+	printf("+++ Calculation time  = %lf\n", di);
 	return 0;
 }
 
