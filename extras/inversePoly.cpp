@@ -60,15 +60,25 @@ void swap(__m256i &a, __m256i &b){
 
 __m256i shift(__m256i &x, int j){
 	uint64_t *ptr = (uint64_t*)(&x);
-	if(j<64)
-		return _mm256_set_epi64x((ptr[3]<<j)^(ptr[2]>>(64-j)),(ptr[2]<<j)^(ptr[1]>>(64-j)),(ptr[1]<<j) ^ (ptr[0]>>(64-j)),ptr[0]<<j);
+	if(j<64){
+		if(j!=0)
+			return _mm256_set_epi64x((ptr[3]<<j)^(ptr[2]>>(64-j)),(ptr[2]<<j)^(ptr[1]>>(64-j)),(ptr[1]<<j) ^ (ptr[0]>>(64-j)),ptr[0]<<j);
+		else 
+			return x;
+	}
 	else if(j<128){
 		j -= 64;
-		return _mm256_set_epi64x((ptr[2]<<j)^(ptr[1]>>(64-j)),(ptr[1]<<j) ^ (ptr[0]>>(64-j)),ptr[0]<<j,0);
+		if(j!=0)
+			return _mm256_set_epi64x((ptr[2]<<j)^(ptr[1]>>(64-j)),(ptr[1]<<j) ^ (ptr[0]>>(64-j)),ptr[0]<<j,0);
+		else 
+			return _mm256_set_epi64x(ptr[2],ptr[1],ptr[0],0);
 	}
 	else if(j<192){
 		j -= 128;
-		return _mm256_set_epi64x((ptr[1]<<j) ^ (ptr[0]>>(64-j)),ptr[0]<<j,0,0);
+		if(j != 0)
+			return _mm256_set_epi64x((ptr[1]<<j) ^ (ptr[0]>>(64-j)),ptr[0]<<j,0,0);
+		else
+			return _mm256_set_epi64x(ptr[1],ptr[0],0,0);
 	}
 	else{
 		j -= 192;
@@ -102,13 +112,12 @@ void inversePoly(__m256i &a, __m256i &g1){
 
 int main(){
 	__m256i a,res;
-
-	a = _mm256_set_epi64x(0,0,0,1);
+	a = _mm256_set_epi64x(0,0,6148914691236517205,6148914691236517205);
 
 	inversePoly(a,res);
 
-	uint32_t *ptr = (uint32_t*)(&res);
-	for(int i=7; i>=0; i--){
+	uint64_t *ptr = (uint64_t*)(&res);
+	for(int i=3; i>=0; i--){
 		cout << ptr[i] << " ";
 	}
 	cout << endl;
