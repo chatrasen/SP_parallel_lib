@@ -433,27 +433,25 @@ node shift(node &f)
 
 node f(bit & a, bit & b, bit *v, int n, ll X, ll Y)
 {
-	//cout<<"n = "<<n<<" X"<<X<<" X"<<Y<<"\n";
-	if(n == 2)
 	{
 		node result(1,1,0);
 		result.a[0][0][0] = 0;
 		result.a[0][1][0] = 1;
-		result.a[1][0][0] = 1;
+		result.a[1][0][0] = -1;
 		result.degree(result);
 		return result;
 	}
 	if(n == 3)
 	{
 		node result(2,2,0);
-		result.a[0][0][0] = 1;
-		result.a[0][1][0] = 0;
+		result.a[0][0][0] = a*a - bit(4)*b*v[0];
+		result.a[0][1][0] = bit(-2)*a*v[0] + bit(-4)*b;
 		result.a[0][2][0] = v[0]*v[0];
-		result.a[1][0][0] = 0;
-		result.a[1][1][0] = bit(2)*v[0]*v[0] + v[0];
-		result.a[1][2][0] = bit(2)*(v[0]);
+		result.a[1][0][0] = bit(-2)*(v[0]*a+ bit(2)*b);
+		result.a[1][1][0] = bit(-2)*(v[0]*v[0] + a);
+		result.a[1][2][0] = bit(-2)*(v[0]);
 		result.a[2][0][0] = v[0]*v[0];
-		result.a[2][1][0] = bit(2)*v[0];
+		result.a[2][1][0] = bit(-2)*v[0];
 		result.a[2][2][0] = 1;
 		result.degree(result);
 		return result;
@@ -481,7 +479,7 @@ node f(bit &a, bit &b, bit *v, int n, ll X)
 	if(n == 2)
 	{
 		node result(1,0,0);
-		result.a[1][0][0] = 1;
+		result.a[1][0][0] = -1;
 		result.a[0][0][0] = v[0];
 		result.degree(result);
 		return result;
@@ -489,10 +487,12 @@ node f(bit &a, bit &b, bit *v, int n, ll X)
 	if(n == 3)
 	{
 		node result(2,0,0);
-		result.a[0][0][0] = (v[0]*v[1])*(v[0]*v[1]) + bit(1);
-		result.a[1][0][0] = ((bit(2)*(v[0] + v[1]) + 1)*(v[0]*v[1]));
-		result.a[2][0][0] = (v[0] + v[1])*(v[0] + v[1]);
+		result.a[0][0][0] = (v[0]*v[1] - a)*(v[0]*v[1] - a) - bit(4)*b*(v[0]+v[1]);
+		result.a[1][0][0] = bit(-2)*((v[0] + v[1])*(v[0]*v[1] + a) + bit(2)*b);
+		result.a[2][0][0] = (v[0] - v[1])*(v[0] - v[1]);
+		//cout<<"gaya\n";
 		result.degree(result);
+		//print(result);
 		return result;
 	}
 	node f1,f2;
@@ -513,13 +513,13 @@ node f(bit & a, bit &b, bit *v, int n)
 	if(n == 2) 
 	{
 		node result(0,0,0);
-		result.a[0][0][0] = v[0] + v[1];
+		result.a[0][0][0] = v[0] - v[1];
 		return result;
 	}
 	if(n == 3) 
 	{
 		node result(0,0,0);
-		result.a[0][0][0] = (v[0] - v[1])*(v[0] + v[1])*v[2]*v[2] + ((bit(2)*(v[0] + v[1]) + 1)*(v[0]*v[1]))*v[2] + (v[0]*v[1])*(v[0]*v[1]) + bit(1);
+		result.a[0][0][0] = (v[0] - v[1])*(v[0] - v[1])*v[2]*v[2] - bit(2)*((v[0] + v[1])*(v[0]*v[1] + a) + bit(2)*b)*v[2] + ((v[0]*v[1] - a)*(v[0]*v[1] - a) - bit(4)*b*(v[0] + v[1]));
 		return result;
 	}
 	node f1,f2;
